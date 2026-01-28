@@ -1,3 +1,7 @@
 """
-PICAM API Package
+PICAM API Routes Package
 """
+
+from app.api.routes import data, metrics, insights, roi
+
+__all__ = ["data", "metrics", "insights", "roi"]

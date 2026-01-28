@@ -1,22 +1,34 @@
 """
-PICAM ROI Tracking API Routes
-Immutable ROI log with hash chain verification
+PICAM ROI Tracking API Routes (Updated)
 """
 
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 from datetime import date
+from pydantic import BaseModel
 
-from app.models.mongodb_models import ROILogEntry, ActionRecommendation
-from app.models.schemas import (
-    ROILogEntryResponse,
-    ROILogListResponse,
-    ActionCompletionInput
-)
-from app.utils import now_utc, create_deterministic_hash, verify_chain
-import uuid
+from app.services import ROITrackerService, get_roi_tracker
+from app.utils import now_utc
 
 router = APIRouter()
+
+
+class ActionImplementationRequest(BaseModel):
+    """Request to mark action as implemented."""
+    action_id: str
+    implementation_date: date
+    actual_cost: Optional[float] = None
+    notes: Optional[str] = None
+
+
+class VerificationRequest(BaseModel):
+    """Request to verify improvement."""
+    action_id: str
+    before_start_date: date
+    before_end_date: date
+    after_start_date: date
+    after_end_date: date
+    actual_cost: float
 
 
 @router.get("/log", response_model=dict)
@@ -26,176 +38,110 @@ async def get_roi_log(
 ):
     """
     Get ROI log entries with chain verification.
-    
-    The log is immutable - each entry contains hash of previous entry.
     """
-    try:
-        entries = await ROILogEntry.find().sort(
-            [("sequence_number", -1)]
-        ).skip(skip).limit(limit).to_list()
-        
-        total = await ROILogEntry.count()
-        
-        # Calculate totals
-        total_savings = sum(e.loss_reduction for e in entries if e.loss_reduction > 0)
-        
-        # Verify chain integrity for returned entries
-        chain_valid = True
-        if len(entries) > 1:
-            for i in range(1, len(entries)):
-                if entries[i].entry_hash != entries[i-1].previous_entry_hash:
-                    chain_valid = False
-                    break
-        
-        return {
-            "entries": [
-                {
-                    "entry_id": e.entry_id,
-                    "timestamp": e.timestamp.isoformat(),
-                    "action_id": e.action_id,
-                    "action_description": e.action_description,
-                    "before_date": e.before_date.isoformat(),
-                    "before_loss": round(e.before_loss, 2),
-                    "after_date": e.after_date.isoformat(),
-                    "after_loss": round(e.after_loss, 2),
-                    "loss_reduction": round(e.loss_reduction, 2),
-                    "improvement_percentage": round(e.improvement_percentage, 2),
-                    "net_benefit": round(e.net_benefit, 2),
-                    "entry_hash": e.entry_hash[:16] + "...",  # Truncated for display
-                    "is_verified": e.is_verified
-                }
-                for e in entries
-            ],
-            "pagination": {
-                "total": total,
-                "limit": limit,
-                "skip": skip
-            },
-            "summary": {
-                "total_verified_savings": round(total_savings, 2),
-                "chain_integrity": "valid" if chain_valid else "broken"
-            }
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    service = get_roi_tracker()
+    return await service.get_roi_log(limit, skip)
 
 
 @router.get("/summary", response_model=dict)
 async def get_roi_summary():
     """
-    Get overall ROI summary across all verified improvements.
+    Get cumulative ROI statistics.
     """
-    try:
-        entries = await ROILogEntry.find({"is_verified": True}).to_list()
-        
-        if not entries:
-            return {
-                "status": "no_data",
-                "message": "No verified ROI entries yet"
-            }
-        
-        total_before_loss = sum(e.before_loss for e in entries)
-        total_after_loss = sum(e.after_loss for e in entries)
-        total_savings = sum(e.loss_reduction for e in entries)
-        total_action_cost = sum(e.action_cost for e in entries)
-        
+    service = get_roi_tracker()
+    return await service.get_cumulative_roi()
+
+
+@router.post("/implement", response_model=dict)
+async def record_action_implementation(request: ActionImplementationRequest):
+    """
+    Record that an action has been implemented.
+    """
+    service = get_roi_tracker()
+    return await service.record_action_implementation(
+        action_id=request.action_id,
+        implementation_date=request.implementation_date,
+        actual_cost=request.actual_cost,
+        notes=request.notes
+    )
+
+
+@router.post("/verify", response_model=dict)
+async def verify_and_record_improvement(request: VerificationRequest):
+    """
+    Verify improvement and create ROI log entry.
+    
+    Compares before and after periods using physics calculations.
+    """
+    service = get_roi_tracker()
+    
+    # Verify improvement
+    verification = await service.verify_improvement(
+        action_id=request.action_id,
+        before_start_date=request.before_start_date,
+        before_end_date=request.before_end_date,
+        after_start_date=request.after_start_date,
+        after_end_date=request.after_end_date
+    )
+    
+    if not verification.is_valid:
         return {
-            "summary": {
-                "total_entries": len(entries),
-                "total_savings": round(total_savings, 2),
-                "total_action_cost": round(total_action_cost, 2),
-                "net_roi": round(total_savings - total_action_cost, 2),
-                "roi_ratio": round(
-                    total_savings / total_action_cost, 2
-                ) if total_action_cost > 0 else None,
-                "avg_improvement_percentage": round(
-                    sum(e.improvement_percentage for e in entries) / len(entries), 2
-                )
-            },
-            "by_action_type": {},  # TODO: Aggregate by type
-            "recent_entries": len(entries)
+            "status": "failed",
+            "message": verification.notes,
+            "verification": None
         }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    
+    # Create ROI entry
+    entry_id = await service.create_roi_entry(
+        action_id=request.action_id,
+        verification=verification,
+        action_cost=request.actual_cost
+    )
+    
+    return {
+        "status": "success",
+        "entry_id": entry_id,
+        "verification": {
+            "before_daily_loss": verification.before_loss,
+            "after_daily_loss": verification.after_loss,
+            "daily_reduction": verification.loss_reduction,
+            "improvement_percentage": verification.improvement_percentage,
+            "confidence": verification.confidence,
+            "physics_verified": verification.physics_verified
+        },
+        "roi": {
+            "action_cost": request.actual_cost,
+            "net_daily_benefit": verification.loss_reduction - request.actual_cost,
+            "payback_days": round(
+                request.actual_cost / verification.loss_reduction, 1
+            ) if verification.loss_reduction > 0 else None
+        }
+    }
 
 
-@router.post("/verify/{entry_id}", response_model=dict)
+@router.get("/verify/{entry_id}", response_model=dict)
 async def verify_roi_entry(entry_id: str):
     """
     Verify integrity of a specific ROI entry.
-    
-    Checks that the entry hash is valid and matches stored data.
     """
-    try:
-        entry = await ROILogEntry.find_one({"entry_id": entry_id})
-        
-        if not entry:
-            raise HTTPException(status_code=404, detail="Entry not found")
-        
-        # Recalculate hash
-        data_for_hash = {
-            "entry_id": entry.entry_id,
-            "timestamp": entry.timestamp.isoformat(),
-            "action_id": entry.action_id,
-            "before_date": entry.before_date.isoformat(),
-            "before_loss": entry.before_loss,
-            "after_date": entry.after_date.isoformat(),
-            "after_loss": entry.after_loss,
-            "previous_entry_hash": entry.previous_entry_hash
-        }
-        
-        calculated_hash = create_deterministic_hash(data_for_hash)
-        hash_valid = calculated_hash == entry.entry_hash
-        
-        return {
-            "entry_id": entry_id,
-            "stored_hash": entry.entry_hash,
-            "calculated_hash": calculated_hash,
-            "is_valid": hash_valid,
-            "integrity": "intact" if hash_valid else "compromised"
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    service = get_roi_tracker()
+    return await service.verify_single_entry(entry_id)
 
 
 @router.get("/chain-integrity", response_model=dict)
 async def verify_chain_integrity():
     """
     Verify integrity of entire ROI chain.
-    
-    Ensures no entries have been tampered with.
     """
-    try:
-        entries = await ROILogEntry.find().sort("sequence_number").to_list()
-        
-        if not entries:
-            return {
-                "status": "empty",
-                "message": "No entries in ROI log"
-            }
-        
-        # Check chain
-        broken_at = None
-        for i in range(1, len(entries)):
-            current = entries[i]
-            previous = entries[i-1]
-            
-            if current.previous_entry_hash != previous.entry_hash:
-                broken_at = i
-                break
-        
-        return {
-            "total_entries": len(entries),
-            "chain_status": "valid" if broken_at is None else "broken",
-            "broken_at_sequence": broken_at,
-            "first_entry": entries[0].entry_id if entries else None,
-            "last_entry": entries[-1].entry_id if entries else None
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    service = get_roi_tracker()
+    is_valid = await service.verify_chain_integrity()
+    
+    return {
+        "chain_status": "valid" if is_valid else "broken",
+        "verified_at": now_utc().isoformat(),
+        "message": (
+            "All entries verified - no tampering detected"
+            if is_valid else
+            "Chain integrity compromised - investigate immediately"
+        )
+    }

@@ -11,6 +11,8 @@ import logging
 from app.config import get_settings
 from app.database import DatabaseManager
 from app.api.routes import metrics, insights, roi, data
+# Add to imports
+from app.api.routes import admin
 
 # Configure logging
 logging.basicConfig(
@@ -144,6 +146,13 @@ app.include_router(
     roi.router,
     prefix=f"{settings.api_prefix}/roi",
     tags=["ROI Tracking"]
+)
+
+# Add to router includes (after ROI router)
+app.include_router(
+    admin.router,
+    prefix=f"{settings.api_prefix}/admin",
+    tags=["Administration"]
 )
 
 
