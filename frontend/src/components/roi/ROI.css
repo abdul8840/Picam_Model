@@ -1,0 +1,367 @@
+/* ROI Log */
+.roi-log-summary {
+  display: flex;
+  gap: 16px;
+}
+
+.summary-item {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.summary-item strong {
+  font-weight: 600;
+}
+
+.roi-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ROI Entry */
+.roi-entry {
+  padding: 20px;
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--border-color);
+  transition: var(--transition-normal);
+}
+
+.roi-entry.positive {
+  border-left-color: var(--accent-success);
+}
+
+.roi-entry.negative {
+  border-left-color: var(--accent-danger);
+}
+
+.roi-entry:hover {
+  background: var(--bg-secondary);
+}
+
+.entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.entry-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.entry-date {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.entry-id {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent-success);
+  border-radius: 50%;
+  font-size: 0.8rem;
+}
+
+.verify-btn {
+  padding: 4px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.verify-btn:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: white;
+}
+
+.entry-action {
+  margin-bottom: 16px;
+}
+
+.action-type {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--accent-primary);
+  color: white;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.action-description {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.entry-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.metric-pair {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius-sm);
+}
+
+.metric-pair .metric {
+  flex: 1;
+  text-align: center;
+}
+
+.metric-pair .metric-label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.metric-pair .metric-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.metric-arrow {
+  color: var(--text-muted);
+  font-size: 1.25rem;
+}
+
+.metric-results {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.result-item {
+  text-align: center;
+  padding: 10px;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius-sm);
+}
+
+.result-item.highlight {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+.result-label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.result-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.result-value.positive {
+  color: var(--accent-success);
+}
+
+.result-value.negative {
+  color: var(--accent-danger);
+}
+
+.entry-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.sequence,
+.hash {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+/* ROI Summary */
+.roi-summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.summary-stat {
+  text-align: center;
+  padding: 20px;
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-sm);
+}
+
+.summary-stat.primary {
+  grid-column: span 1;
+  background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+  border: 1px solid var(--accent-success);
+}
+
+.summary-stat .stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.summary-stat .stat-value.positive {
+  color: var(--accent-success);
+}
+
+.summary-stat .stat-value.negative {
+  color: var(--accent-danger);
+}
+
+.summary-stat .stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.action-type-breakdown h4 {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.type-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.type-item {
+  padding: 16px;
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-sm);
+}
+
+.type-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.type-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.type-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.type-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.type-stat {
+  display: flex;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.type-stat .label {
+  color: var(--text-muted);
+}
+
+.type-stat .value {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.type-stat .value.positive {
+  color: var(--accent-success);
+}
+
+.chain-note {
+  padding: 16px;
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-sm);
+  border-left: 3px solid var(--accent-info);
+}
+
+.chain-note p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .metric-results {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .summary-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .metric-results {
+    grid-template-columns: 1fr;
+  }
+  
+  .metric-pair {
+    flex-direction: column;
+  }
+  
+  .metric-arrow {
+    transform: rotate(90deg);
+  }
+  
+  .type-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .roi-log-summary {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
