@@ -10,9 +10,7 @@ import logging
 
 from app.config import get_settings
 from app.database import DatabaseManager
-from app.api.routes import metrics, insights, roi, data
-# Add to imports
-from app.api.routes import admin
+from app.api.routes import data, metrics, insights, roi, admin
 
 # Configure logging
 logging.basicConfig(
@@ -87,9 +85,7 @@ app.add_middleware(
 # Health check endpoint
 @app.get("/health", tags=["System"])
 async def health_check():
-    """
-    System health check endpoint.
-    """
+    """System health check endpoint."""
     db_health = await DatabaseManager.health_check()
     
     return {
@@ -104,9 +100,7 @@ async def health_check():
 
 @app.get("/", tags=["System"])
 async def root():
-    """
-    Root endpoint with system information.
-    """
+    """Root endpoint with system information."""
     return {
         "system": "PICAM",
         "name": "Physics-based Intelligent Capacity and Money",
@@ -148,7 +142,6 @@ app.include_router(
     tags=["ROI Tracking"]
 )
 
-# Add to router includes (after ROI router)
 app.include_router(
     admin.router,
     prefix=f"{settings.api_prefix}/admin",
@@ -159,9 +152,7 @@ app.include_router(
 # Error handlers
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
-    """
-    Global exception handler for unhandled errors.
-    """
+    """Global exception handler for unhandled errors."""
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
     return {
         "error": "Internal server error",

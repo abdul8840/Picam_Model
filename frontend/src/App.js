@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/common/Header';
 import Sidebar from './components/common/Sidebar';
+import NotificationToast from './components/common/NotificationToast';
 import Dashboard from './pages/Dashboard';
 import Metrics from './pages/Metrics';
 import Insights from './pages/Insights';
@@ -26,6 +27,7 @@ function App() {
           </Routes>
         </div>
       </div>
+      <NotificationToast />
     </div>
   );
 }
