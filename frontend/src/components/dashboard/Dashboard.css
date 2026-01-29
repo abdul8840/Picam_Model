@@ -1,0 +1,234 @@
+/* Insight Card Styles */
+.insight-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.insight-section-title {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.insight-highlight {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-sm);
+}
+
+.insight-highlight.loss {
+  border-left: 3px solid var(--accent-danger);
+}
+
+.insight-highlight.action {
+  border-left: 3px solid var(--accent-success);
+}
+
+.highlight-icon {
+  font-size: 1.5rem;
+}
+
+.highlight-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.highlight-location {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.highlight-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-danger);
+}
+
+.highlight-cause,
+.highlight-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.highlight-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.potential-recovery {
+  color: var(--accent-success);
+  font-weight: 500;
+}
+
+.confidence {
+  color: var(--text-muted);
+}
+
+.insight-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.insight-stat {
+  text-align: center;
+}
+
+.insight-stat .stat-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.insight-stat .stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Loss Location Styles */
+.loss-locations {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loss-location-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.location-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.location-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.location-loss {
+  font-weight: 600;
+  color: var(--accent-danger);
+}
+
+.location-bar {
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.location-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-danger), var(--accent-warning));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* Action Card Styles */
+.action-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.action-type {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--accent-primary);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.action-description {
+  font-size: 1rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.action-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.action-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.action-metric .metric-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.action-metric .metric-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.action-metric .metric-value.positive {
+  color: var(--accent-success);
+}
+
+.action-metric .metric-value.negative {
+  color: var(--accent-danger);
+}
+
+.action-physics {
+  padding: 16px;
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-sm);
+}
+
+.action-physics h5 {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.action-physics p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.action-implement-btn {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Empty State */
+.empty-state,
+.insight-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  color: var(--text-muted);
+  gap: 16px;
+}
+
+/* Quick Stats */
+.quick-stats {
+  margin-bottom: 24px;
+}

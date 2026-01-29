@@ -1,0 +1,64 @@
+.chart-container {
+  width: 100%;
+}
+
+.chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-muted);
+}
+
+.chart-tooltip {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: 12px;
+  box-shadow: var(--shadow-lg);
+}
+
+.tooltip-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.tooltip-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 2px 0;
+}
+
+/* Gauge styles */
+.gauge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+}
+
+.gauge {
+  width: 140px;
+  height: 140px;
+}
+
+.gauge-bg {
+  stroke: var(--bg-tertiary);
+}
+
+.gauge-value {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.gauge-label {
+  font-size: 10px;
+}
+
+.gauge-status {
+  margin-top: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
